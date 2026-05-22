@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f0e17" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Kế Hoạch" />
+  <title>Kế Hoạch 3 Tháng</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: #0f0e17; height: 100%; }
+    #root { height: 100%; }
+    * { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+
+const DAILY_SCHEDULE = [
+  { id: "s1", time: "06:30 - 07:00", icon: "🌅", label: "Thức dậy & vệ sinh", note: "Uống 300ml nước ấm – kích hoạt hệ tiêu hóa", category: "routine" },
+  { id: "s2", time: "07:00 - 07:30", icon: "🍜", label: "Bữa sáng (Bữa 1)", note: "Phở bò / hủ tiếu hoặc cơm tấm + 1 ly sữa tươi nguyên kem", category: "nutrition" },
+  { id: "s3", time: "07:30 - 09:00", icon: "🇬🇧", label: "Học tiếng Anh", note: "Từ vựng & phản xạ thương mại – não bộ minh mẫn nhất", category: "learning" },
+  { id: "s4", time: "09:00 - 09:30", icon: "🥚", label: "Bữa phụ sáng (Bữa 2)", note: "2 trứng luộc + 1 quả chuối tiêu", category: "nutrition" },
+  { id: "s5", time: "09:30 - 12:00", icon: "👜", label: "Rebranding Desino", note: "Nghiên cứu thị trường, định vị, phân tích đối thủ", category: "work" },
+  { id: "s6", time: "12:00 - 13:00", icon: "🍚", label: "Bữa trưa (Bữa 3)", note: "2 chén cơm + 200g thịt + rau xanh + trái cây", category: "nutrition" },
+  { id: "s7", time: "13:00 - 13:45", icon: "😴", label: "Nghỉ trưa", note: "Ngủ ngắn 20-30 phút – phục hồi năng lượng", category: "routine" },
+  { id: "s8", time: "13:45 - 15:45", icon: "🛍️", label: "Brand Túi Tote mới", note: "Idea, chất liệu, khảo sát nguồn vải canvas/da lộn", category: "work" },
+  { id: "s9", time: "15:45 - 16:15", icon: "🍠", label: "Bữa phụ chiều (Bữa 4)", note: "Khoai lang luộc + sữa đậu nành / ngũ cốc", category: "nutrition" },
+  { id: "s10", time: "16:15 - 17:15", icon: "🤖", label: "Học AI", note: "Midjourney, ChatGPT, Adobe Firefly – ứng dụng vào brand", category: "learning" },
+  { id: "s11", time: "17:30 - 18:45", icon: "🏋️", label: "Tập Gym", note: "Tăng cân – Tăng cơ · Không vượt 70 phút", category: "gym" },
+  { id: "s12", time: "19:15 - 20:00", icon: "🐟", label: "Bữa tối (Bữa 5)", note: "2 chén cơm + 200g cá hồi/thịt bò + canh rau + sữa chua", category: "nutrition" },
+  { id: "s13", time: "20:00 - 21:30", icon: "💍", label: "Chuẩn bị Đám Hỏi / Giải trí", note: "Checklist đám hỏi (trước 20/6) → Đọc sách sau 20/6", category: "personal" },
+  { id: "s14", time: "21:30 - 22:00", icon: "🥛", label: "Bữa phụ tối (Bữa 6)", note: "1 ly sữa ấm + hạt hạnh nhân / óc chó", category: "nutrition" },
+  { id: "s15", time: "22:30", icon: "🌙", label: "Tắt thiết bị & Ngủ", note: "7-8 tiếng ngủ để cơ bắp phát triển và tái tạo cơ thể", category: "routine" },
+];
+
+const GYM_PLAN = {
+  "Thứ 2": { muscle: "Ngực - Tay sau", color: "#e74c3c", exercises: ["Barbell Bench Press – 4 hiệp x 8-10 reps","Incline Dumbbell Press – 3 hiệp x 10 reps","Tricep Pushdown – 3 hiệp x 12 reps"] },
+  "Thứ 4": { muscle: "Lưng - Tay trước", color: "#3498db", exercises: ["Lat Pulldown – 4 hiệp x 10 reps","Bent Over Row – 3 hiệp x 10 reps","Bicep Curl – 3 hiệp x 12 reps"] },
+  "Thứ 5": { muscle: "Vai - Bụng", color: "#f39c12", exercises: ["Overhead Press – 4 hiệp x 8-10 reps","Dumbbell Lateral Raise – 3 hiệp x 12 reps","Plank – 3 hiệp x 45-60 giây"] },
+  "Thứ 7": { muscle: "Chân - Mông", color: "#27ae60", exercises: ["Barbell Squat – 4 hiệp x 8-10 reps","Leg Press – 3 hiệp x 10 reps","Romanian Deadlift – 3 hiệp x 10 reps"] },
+};
+
+const ROADMAP = [
+  { project: "Chuẩn bị Đám Hỏi", icon: "💍", m1: "Chốt sính lễ, tráp, trang phục. Làm việc với đơn vị decor. Hoàn tất 20/6.", m2: "Tổng kết tài chính, nghỉ ngơi tuần đầu.", m3: "Duy trì cuộc sống ổn định." },
+  { project: "Rebranding Desino", icon: "✨", m1: "Nghiên cứu tệp KH hiện tại, đánh giá lại brand cũ.", m2: "Brand Identity mới (Logo, màu sắc). Ứng dụng AI.", m3: "Truyền thông ra mắt diện mạo mới, lookbook." },
+  { project: "Brand Túi Tote", icon: "🛍️", m1: "Nghiên cứu đối thủ. Phác thảo 3 dòng túi cơ bản.", m2: "Khảo sát xưởng, nguồn vải canvas. May mẫu Sample v1.", m3: "Sửa mẫu v2. Tính COGS, bao bì eco-friendly." },
+  { project: "Học tiếng Anh", icon: "🇬🇧", m1: "Phản xạ giao tiếp cơ bản, từ vựng chuyên ngành túi xách.", m2: "Viết email thương mại, kỹ năng đàm phán B2B.", m3: "Luyện nói 1:1, thuyết trình bằng tiếng Anh." },
+  { project: "Học AI", icon: "🤖", m1: "Prompts ChatGPT (content), Midjourney (moodboard đám hỏi).", m2: "Generative AI thiết kế đồ họa (Firefly, Midjourney) cho Desino.", m3: "Tự động hóa workflow, phân tích dữ liệu AI nâng cao." },
+];
+
+const CATEGORY_COLORS = {
+  routine:   { bg: "#2a1f3d", border: "#9b59b6", dot: "#9b59b6" },
+  nutrition: { bg: "#2a1f0a", border: "#f39c12", dot: "#e67e22" },
+  learning:  { bg: "#0a1f2a", border: "#3498db", dot: "#2980b9" },
+  work:      { bg: "#0a2a1a", border: "#27ae60", dot: "#1e8449" },
+  gym:       { bg: "#2a0f0f", border: "#e74c3c", dot: "#c0392b" },
+  personal:  { bg: "#2a0a1f", border: "#e91e8c", dot: "#c2185b" },
+};
+
+const CATEGORY_LABELS = { routine:"Thói quen", nutrition:"Dinh dưỡng", learning:"Học tập", work:"Công việc", gym:"Tập luyện", personal:"Cá nhân" };
+
+const STORAGE_KEY = "kehoach_checked_v1";
+
+const todayDayIndex = () => { const d = new Date().getDay(); if(d===0) return 0; return d-1; };
+
+function App() {
+  const [activeDay, setActiveDay] = useState(Math.min(5, Math.max(0, todayDayIndex())));
+  const [activeTab, setActiveTab] = useState("checklist");
+  const [checked, setChecked] = useState(() => {
+    try { const s = localStorage.getItem(STORAGE_KEY); if(s) return JSON.parse(s); } catch(e){}
+    const init = {};
+    DAYS.forEach((_,di) => { DAILY_SCHEDULE.forEach(s => { init[`${di}-${s.id}`] = false; }); });
+    return init;
+  });
+  const [expandedProject, setExpandedProject] = useState(null);
+  const [filterCat, setFilterCat] = useState("all");
+
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(checked)); } catch(e){}
+  }, [checked]);
+
+  const toggleCheck = (key) => setChecked(prev => ({ ...prev, [key]: !prev[key] }));
+
+  const filteredSchedule = DAILY_SCHEDULE.filter(s => filterCat==="all" || s.category===filterCat);
+  const total = filteredSchedule.length;
+  const done = filteredSchedule.filter(s => checked[`${activeDay}-${s.id}`]).length;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  const gymDay = GYM_PLAN[DAYS[activeDay]];
+
+  return (
+    <div style={{fontFamily:"'Be Vietnam Pro','Segoe UI',sans-serif",background:"#0f0e17",minHeight:"100vh",color:"#fffffe",paddingBottom:30}}>
+      <style>{`
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+        @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .slide-in{animation:slideIn 0.25s ease forwards}
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+        button{font-family:inherit}
+      `}</style>
+
+      {/* HEADER */}
+      <div style={{background:"linear-gradient(135deg,#1a0533 0%,#0f0e17 100%)",padding:"env(safe-area-inset-top,16px) 18px 14px",borderBottom:"1px solid #2d2b45"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+          <div style={{width:8,height:8,borderRadius:"50%",background:"#a78bfa",boxShadow:"0 0 10px #a78bfa",animation:"pulse 2s infinite"}}/>
+          <span style={{fontSize:10,fontWeight:700,letterSpacing:2,color:"#a78bfa",textTransform:"uppercase"}}>Kế hoạch 3 tháng · 5–8/2026</span>
+        </div>
+        <h1 style={{fontSize:22,fontWeight:800,letterSpacing:-0.5}}>Thời gian biểu <span style={{color:"#a78bfa"}}>cá nhân</span></h1>
+        <p style={{fontSize:11,color:"#8b8aa0",marginTop:3}}>1m72 · 58kg→62kg · Desino · Túi Tote · Anh văn · AI · 💍 20/6</p>
+      </div>
+
+      {/* TABS */}
+      <div style={{display:"flex",gap:4,padding:"10px 18px",borderBottom:"1px solid #2d2b45",background:"#0f0e17",position:"sticky",top:0,zIndex:10}}>
+        {[["checklist","✅ Ngày"],["gym","🏋️ Gym"],["roadmap","🗺️ Lộ trình"]].map(([k,l])=>(
+          <button key={k} onClick={()=>setActiveTab(k)}
+            style={{flex:1,padding:"9px 4px",borderRadius:10,fontSize:12,fontWeight:700,border:"none",cursor:"pointer",
+              color:activeTab===k?"#0f0e17":"#8b8aa0",background:activeTab===k?"#a78bfa":"#1e1c30",transition:"all 0.2s"}}>
+            {l}
+          </button>
+        ))}
+      </div>
+
+      <div style={{padding:"0 18px"}}>
+
+      {/* ===== CHECKLIST TAB ===== */}
+      {activeTab==="checklist" && (
+        <div className="slide-in">
+          {/* Day selector */}
+          <div style={{display:"flex",gap:6,padding:"12px 0",overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
+            {DAYS.map((d,i)=>{
+              const dayDone = DAILY_SCHEDULE.filter(s=>checked[`${i}-${s.id}`]).length;
+              const isActive = activeDay===i;
+              return (
+                <button key={d} onClick={()=>setActiveDay(i)}
+                  style={{padding:"9px 14px",background:isActive?"#a78bfa":"#1e1c30",color:isActive?"#0f0e17":"#fffffe",
+                    fontWeight:700,fontSize:12,whiteSpace:"nowrap",border:"none",borderRadius:10,cursor:"pointer",
+                    position:"relative",flexShrink:0,transition:"all 0.2s"}}>
+                  {d}
+                  {dayDone>0&&<span style={{position:"absolute",top:-4,right:-4,background:"#27ae60",color:"#fff",
+                    borderRadius:"50%",width:15,height:15,fontSize:9,display:"flex",alignItems:"center",
+                    justifyContent:"center",fontWeight:800}}>{dayDone}</span>}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Progress */}
+          <div style={{background:"#1e1c30",borderRadius:14,padding:14,marginBottom:14}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+              <span style={{fontWeight:700,fontSize:14}}>{DAYS[activeDay]}</span>
+              <span style={{fontSize:12,color:"#a78bfa",fontWeight:700}}>{done}/{total}</span>
+            </div>
+            <div style={{background:"#2d2b45",borderRadius:99,height:7,overflow:"hidden"}}>
+              <div style={{width:`${pct}%`,height:"100%",background:pct===100?"#27ae60":"linear-gradient(90deg,#a78bfa,#7c3aed)",borderRadius:99,transition:"width 0.4s ease"}}/>
+            </div>
+            <div style={{textAlign:"right",fontSize:10,color:"#8b8aa0",marginTop:5}}>{pct}% hoàn thành</div>
+          </div>
+
+          {/* Category filter */}
+          <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:12}}>
+            {[["all","Tất cả"],["routine","Thói quen"],["nutrition","Dinh dưỡng"],["learning","Học tập"],["work","Công việc"],["gym","Gym"],["personal","Cá nhân"]].map(([k,l])=>{
+              const isA = filterCat===k;
+              const col = k==="all"?"#a78bfa":(CATEGORY_COLORS[k]?.dot||"#a78bfa");
+              return (
+                <button key={k} onClick={()=>setFilterCat(k)}
+                  style={{border:"none",cursor:"pointer",borderRadius:20,fontSize:11,fontWeight:600,padding:"5px 11px",
+                    background:isA?col:"#2d2b45",color:isA?"#fff":"#fffffe",transition:"all 0.2s"}}>
+                  {l}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Items */}
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {filteredSchedule.map(item=>{
+              const key=`${activeDay}-${item.id}`;
+              const isDone=checked[key];
+              const c=CATEGORY_COLORS[item.category];
+              return (
+                <div key={item.id} onClick={()=>toggleCheck(key)}
+                  style={{display:"flex",gap:10,alignItems:"flex-start",padding:"13px 14px",
+                    background:isDone?"#1a2e1a":"#1e1c30",border:`1.5px solid ${isDone?"#27ae60":c.border}`,
+                    borderRadius:14,cursor:"pointer",opacity:isDone?0.75:1,transition:"all 0.2s",userSelect:"none"}}>
+                  <div style={{width:24,height:24,borderRadius:"50%",border:`2px solid ${isDone?"#27ae60":c.dot}`,
+                    background:isDone?"#27ae60":"transparent",color:"#fff",fontSize:13,display:"flex",
+                    alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:2}}>
+                    {isDone?"✓":""}
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                      <span style={{fontSize:16}}>{item.icon}</span>
+                      <span style={{fontWeight:700,fontSize:13,textDecoration:isDone?"line-through":"none",color:isDone?"#8b8aa0":"#fffffe"}}>{item.label}</span>
+                      <span style={{fontSize:9,padding:"2px 7px",borderRadius:99,background:c.bg,color:c.dot,fontWeight:700}}>{CATEGORY_LABELS[item.category]}</span>
+                    </div>
+                    <div style={{fontSize:10,color:"#8b8aa0",marginTop:3}}>{item.time}</div>
+                    <div style={{fontSize:11,color:isDone?"#6b8a6b":"#a8a6c0",marginTop:3,lineHeight:1.4}}>{item.note}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Gym reminder */}
+          {gymDay ? (
+            <div style={{marginTop:16,background:"#1e0f0f",border:"1.5px solid #e74c3c",borderRadius:14,padding:14}}>
+              <div style={{fontWeight:700,fontSize:13,color:"#e74c3c",marginBottom:8}}>🏋️ Hôm nay tập: {gymDay.muscle}</div>
+              {gymDay.exercises.map((ex,i)=><div key={i} style={{fontSize:12,color:"#fdb8b8",marginBottom:3}}>· {ex}</div>)}
+            </div>
+          ) : (
+            <div style={{marginTop:16,background:"#0f1e10",border:"1.5px solid #27ae60",borderRadius:14,padding:14,fontSize:12,color:"#6fcf97"}}>
+              💚 Hôm nay là ngày nghỉ tập — phục hồi cơ bắp và nạp năng lượng!
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ===== GYM TAB ===== */}
+      {activeTab==="gym" && (
+        <div className="slide-in">
+          <div style={{padding:"14px 0 8px",fontSize:12,color:"#8b8aa0"}}>4 buổi/tuần · Mục tiêu 58kg → 62-63kg trong 3 tháng</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16}}>
+            {[["🎯 Mục tiêu","62-63kg (+4-5kg cơ)","#a78bfa"],["🔥 Calo/ngày","2.600 – 2.800 kcal","#e74c3c"],["💧 Nước/ngày","2.5 – 3 lít","#3498db"],["🛌 Ngủ/đêm","7 – 8 tiếng","#27ae60"]].map(([l,v,col])=>(
+              <div key={l} style={{background:"#1e1c30",borderRadius:12,padding:12,borderLeft:`3px solid ${col}`}}>
+                <div style={{fontSize:11,color:"#8b8aa0"}}>{l}</div>
+                <div style={{fontWeight:700,fontSize:13,color:col,marginTop:4}}>{v}</div>
+              </div>
+            ))}
+          </div>
+          {Object.entries(GYM_PLAN).map(([day,plan])=>(
+            <div key={day} style={{background:"#1e1c30",borderRadius:14,padding:16,marginBottom:10,borderLeft:`3px solid ${plan.color}`}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                <span style={{fontWeight:800,fontSize:15}}>{day}</span>
+                <span style={{fontSize:12,color:plan.color,fontWeight:600}}>{plan.muscle}</span>
+              </div>
+              {plan.exercises.map((ex,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 0",borderBottom:i<plan.exercises.length-1?"1px solid #2d2b45":"none"}}>
+                  <div style={{width:5,height:5,borderRadius:"50%",background:plan.color,flexShrink:0}}/>
+                  <span style={{fontSize:12,color:"#d4d2e8"}}>{ex}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+          <div style={{background:"#0f1e10",border:"1.5px solid #27ae60",borderRadius:14,padding:14}}>
+            <div style={{fontWeight:700,color:"#6fcf97",marginBottom:5,fontSize:13}}>🟢 Nghỉ: Thứ 3, Thứ 6, Chủ Nhật</div>
+            <div style={{fontSize:12,color:"#6b8a6b",lineHeight:1.5}}>Không tập để cơ bắp phục hồi và phát triển tối ưu.</div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== ROADMAP TAB ===== */}
+      {activeTab==="roadmap" && (
+        <div className="slide-in">
+          <div style={{display:"flex",margin:"14px 0 12px",background:"#1e1c30",borderRadius:10,overflow:"hidden"}}>
+            {[["T1","22/5-20/6","#7c3aed"],["T2","21/6-20/7","#5b21b6"],["T3","21/7-22/8","#3730a3"]].map(([t,d,col],i)=>(
+              <div key={t} style={{flex:1,padding:"10px 6px",textAlign:"center",background:col,color:"#fff",borderRight:i<2?"1px solid #4c1d95":"none"}}>
+                <div style={{fontSize:13,fontWeight:800}}>{t}</div>
+                <div style={{opacity:0.7,marginTop:2,fontSize:9}}>{d}</div>
+              </div>
+            ))}
+          </div>
+          {ROADMAP.map(proj=>{
+            const isOpen=expandedProject===proj.project;
+            return (
+              <div key={proj.project} style={{background:"#1e1c30",borderRadius:14,marginBottom:8,border:"1.5px solid #2d2b45",overflow:"hidden"}}>
+                <div onClick={()=>setExpandedProject(isOpen?null:proj.project)}
+                  style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",cursor:"pointer",userSelect:"none"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:20}}>{proj.icon}</span>
+                    <span style={{fontWeight:700,fontSize:14}}>{proj.project}</span>
+                  </div>
+                  <span style={{color:"#a78bfa",fontSize:16,transform:isOpen?"rotate(180deg)":"none",transition:"transform 0.2s",display:"inline-block"}}>⌄</span>
+                </div>
+                {isOpen&&(
+                  <div style={{borderTop:"1px solid #2d2b45"}}>
+                    {[["🟣 Tháng 1",proj.m1,"#7c3aed"],["🔵 Tháng 2",proj.m2,"#5b21b6"],["⬛ Tháng 3",proj.m3,"#3730a3"]].map(([label,text,col])=>(
+                      <div key={label} style={{padding:"11px 16px",borderBottom:"1px solid #1a1830",borderLeft:`3px solid ${col}`}}>
+                        <div style={{fontSize:10,fontWeight:700,color:"#8b8aa0",marginBottom:4}}>{label}</div>
+                        <div style={{fontSize:12,color:"#d4d2e8",lineHeight:1.5}}>{text}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          <div style={{background:"#1a1030",border:"1.5px solid #a78bfa",borderRadius:14,padding:14}}>
+            <div style={{fontWeight:700,color:"#a78bfa",marginBottom:5,fontSize:13}}>📋 Chủ Nhật</div>
+            <div style={{fontSize:12,color:"#c4b5fd",lineHeight:1.5}}>Sáng nghỉ ngơi hoàn toàn. Chiều mua sắm nguyên liệu hoặc họp gia đình về đám hỏi.</div>
+          </div>
+        </div>
+      )}
+
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
